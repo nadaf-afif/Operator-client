@@ -1,4 +1,4 @@
-package xtxt.operatorclient.app.operatorlogin;
+package xtxt.operatorclient.app.xtxt;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

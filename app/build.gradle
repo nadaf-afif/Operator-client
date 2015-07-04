@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "xtxt.operatorclient.app.operatorlogin"
+        applicationId "app.operatorclient.xtxt"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 1
