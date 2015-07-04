@@ -76,6 +76,7 @@
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:hint="Username"
+                android:singleLine="true"
                 android:textColorHint="@color/grayhint"
                 android:background="@null" />
 
@@ -103,6 +104,7 @@
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:hint="Password"
+                android:singleLine="true"
                 android:textColorHint="@color/grayhint"
                 android:background="@null" />
 
