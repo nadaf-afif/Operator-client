@@ -74,6 +74,7 @@
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:hint="Username"
+                android:textColorHint="@color/grayhint"
                 android:background="@null" />
 
             <ImageView
@@ -81,7 +82,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:layout_gravity="center"
-                android:background="@drawable/username_icon" />
+                android:src="@drawable/username_icon" />
         </LinearLayout>
 
         <LinearLayout
@@ -99,6 +100,7 @@
                 android:layout_weight="1"
                 android:padding="10dp"
                 android:hint="Password"
+                android:textColorHint="@color/grayhint"
                 android:background="@null" />
 
             <ImageView
@@ -106,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:padding="10dp"
                 android:layout_gravity="center"
-                android:background="@drawable/password_icon" />
+                android:src="@drawable/password_icon" />
         </LinearLayout>
 
         <TextView
