@@ -1,24 +1,19 @@
 package app.operatorclient.xtxt;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
 import app.operatorclient.xtxt.Requestmanager.Utils;
@@ -71,9 +66,14 @@ public class LoginActivity extends Activity {
 
     class LoginAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
 
+        ProgressDialog progressDialog;
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            progressDialog = new ProgressDialog(LoginActivity.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
         }
 
         @Override
@@ -101,6 +101,11 @@ public class LoginActivity extends Activity {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
             try {
                 JSONObject responseJSON = new JSONObject(result);
                 boolean error = responseJSON.getBoolean(ERROR);
