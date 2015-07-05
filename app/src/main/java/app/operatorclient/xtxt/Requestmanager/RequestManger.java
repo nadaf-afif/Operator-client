@@ -10,51 +10,67 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
 
 import java.util.List;
 
 /**
  * Created by mac on 04/07/15.
  */
+@SuppressWarnings("ALL")
 public class RequestManger {
 
-    public static final String HOST = "http://stage.operator-api.xtxt.co/api/v1";
+    public static final String HOST = "http://stage.operator-api.xtxt.co/api/v1/";
 
     public static final String APIKEY = "Authorization";
     public static final String APIKEYVALUE = "xTxt123456";
-    public static final String REQUESTERKEY = "requester";
+    public static final String REQUESTERKEY = "Requester";
     public static final String REQUESTERVALUE = "xtxt-app-global";
 
-    public static String postHttpRequestWithHeader(List<NameValuePair> pairs, String url) {
+    public static final String PREFERENCES = "appPreferences";
+
+    public interface Constantas {
+        public static final String ERROR = "error";
+        public static final String DATA = "data";
+        public static final String USERID = "user_id";
+        public static final String SESSIONID = "session_id";
+        public static final String NAME = "name";
+        public static final String MESSAGEOFTHEDAY = "message_of_the_day";
+
+    }
+
+    public static String postHttpRequestWithHeader(JSONObject object, String url) {
 
         String responseString = null;
 
         try {
 
-            HttpClient client = new DefaultHttpClient();
+            HttpClient hc = new DefaultHttpClient();
+            String message;
+            message = object.toString();
 
-            HttpPost post = new HttpPost(url);
-            post.setEntity(new UrlEncodedFormEntity(pairs, "UTF8"));
-            post.setHeader(APIKEY, APIKEYVALUE);
-            post.setHeader(REQUESTERKEY, REQUESTERVALUE);
-            post.setHeader("Content-type", "application/json");
+            HttpPost p = new HttpPost(url);
+            Log.d("json", message);
+            p.setEntity(new StringEntity(message, "UTF8"));
+            p.setHeader("Content-type", "application/json");
+            p.setHeader(APIKEY, APIKEYVALUE);
+            p.setHeader(REQUESTERKEY, REQUESTERVALUE);
 
-            HttpResponse response = client.execute(post);
-            int statuscode = response.getStatusLine().getStatusCode();
-
+            HttpResponse response = hc.execute(p);
+            Log.d("Status line", "" + response.getStatusLine().getStatusCode());
             responseString = EntityUtils.toString(response.getEntity());
-
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Log.d("RESPONSE GET", responseString + " ");
+        Log.d("RESPONSE POST", responseString + " ");
         return responseString;
 
     }

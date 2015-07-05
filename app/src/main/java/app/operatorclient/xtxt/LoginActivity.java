@@ -1,10 +1,13 @@
 package app.operatorclient.xtxt;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -12,6 +15,7 @@ import android.widget.Toast;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +38,9 @@ public class LoginActivity extends Activity {
         passwordEdittext = (EditText) findViewById(R.id.passwordEdittext);
         loginTextView = (TextView) findViewById(R.id.loginTextView);
 
+//        usernameEdittext.setText("absop");
+//        passwordEdittext.setText("ranium123");
+
         loginTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,18 +58,18 @@ public class LoginActivity extends Activity {
                     return;
                 }
 
+                if (RequestManger.isConnectedToInternet(LoginActivity.this)) {
+                    new LoginAsynctask().execute(username, password);
+                } else {
+                    Toast.makeText(LoginActivity.this, "Please check Internet Connection.", Toast.LENGTH_LONG).show();
+                }
 
-                new LoginAsynctask().execute(username, password);
-
-//                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                startActivity(intent);
-//                finish();
             }
         });
 
     }
 
-    class LoginAsynctask extends AsyncTask<String, Void, String> {
+    class LoginAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
 
         @Override
         protected void onPreExecute() {
@@ -72,22 +79,61 @@ public class LoginActivity extends Activity {
         @Override
         protected String doInBackground(String... params) {
 
-            String response;
+            String response = "";
 
-            List<NameValuePair> pairs = new ArrayList<NameValuePair>();
-            pairs.add(new BasicNameValuePair("username", params[0]));
-            pairs.add(new BasicNameValuePair("password", params[1]));
-            pairs.add(new BasicNameValuePair("app_version", Utils.getAppVer(LoginActivity.this)));
-            pairs.add(new BasicNameValuePair("android_version", Utils.getAndroidVer()));
+            JSONObject object = new JSONObject();
+            try {
 
-            response = RequestManger.postHttpRequestWithHeader(pairs, RequestManger.HOST + "login");
+                object.put("username", params[0]);
+                object.put("password", params[1]);
+                object.put("app_version", Utils.getAppVer(LoginActivity.this));
+                object.put("android_version", Utils.getAndroidVer());
 
+                response = RequestManger.postHttpRequestWithHeader(object, RequestManger.HOST + "login");
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
             return response;
         }
 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            try {
+                JSONObject responseJSON = new JSONObject(result);
+                boolean error = responseJSON.getBoolean(ERROR);
+
+                if (!error) {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+
+                    String uid = dataJSON.getString(USERID);
+                    String sessionid = dataJSON.getString(SESSIONID);
+                    String name = dataJSON.getString(NAME);
+                    String mod = dataJSON.getString(MESSAGEOFTHEDAY);
+
+                    SharedPreferences.Editor editor = getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE).edit();
+                    editor.putString(USERID, uid);
+                    editor.putString(SESSIONID, sessionid);
+                    editor.putString(NAME, name);
+                    editor.putString(MESSAGEOFTHEDAY, mod);
+                    editor.apply();
+
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    startActivity(intent);
+                    finish();
+
+                } else {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    String message = dataJSON.getString("message");
+                    Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Toast.makeText(LoginActivity.this, "Unable to Login", Toast.LENGTH_LONG).show();
+            }
         }
 
     }

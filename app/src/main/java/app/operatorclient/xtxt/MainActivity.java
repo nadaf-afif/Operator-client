@@ -1,5 +1,7 @@
 package app.operatorclient.xtxt;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -14,12 +16,15 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import app.operatorclient.xtxt.Requestmanager.RequestManger;
 import app.operatorclient.xtxt.adapter.NavDrawerListAdapter;
 
 /**
@@ -29,6 +34,7 @@ public class MainActivity extends ActionBarActivity {
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
+    private TextView mDrawerTextView;
     private ActionBarDrawerToggle mDrawerToggle;
 
     // nav drawer title
@@ -40,15 +46,21 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<String> navDrawerItems;
     private NavDrawerListAdapter adapter;
 
+    private SharedPreferences prefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        prefs = getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE);
+
         mTitle = mDrawerTitle = getTitle();
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.list_slidermenu);
+        mDrawerTextView = (TextView) findViewById(R.id.welcometext);
+        mDrawerTextView.setText("Hi " + prefs.getString(RequestManger.Constantas.NAME, "") + "!");
 
         navDrawerItems = new ArrayList<String>();
 
@@ -115,6 +127,9 @@ public class MainActivity extends ActionBarActivity {
             mDrawerList.setItemChecked(position, true);
             mDrawerList.setSelection(position);
             setTitle(navDrawerItems.get(position));
+            if (position == 0) {
+                setTitle("Welcome " + prefs.getString(RequestManger.Constantas.NAME, ""));
+            }
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             // error in creating fragment
@@ -150,4 +165,13 @@ public class MainActivity extends ActionBarActivity {
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
