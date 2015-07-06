@@ -1,6 +1,7 @@
 package app.operatorclient.xtxt.Requestmanager;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
@@ -30,5 +31,10 @@ public class Utils {
 
         }
         return version;
+    }
+
+    public static void clearPreferences(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE);
+        prefs.edit().clear().commit();
     }
 }

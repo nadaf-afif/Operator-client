@@ -20,6 +20,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by mac on 04/07/15.
@@ -33,6 +34,8 @@ public class RequestManger {
     public static final String APIKEYVALUE = "xTxt123456";
     public static final String REQUESTERKEY = "Requester";
     public static final String REQUESTERVALUE = "xtxt-app-global";
+    public static final String REQUESTERADMIN = "xtxt-app-admin";
+
 
     public static final String PREFERENCES = "appPreferences";
 
@@ -46,7 +49,7 @@ public class RequestManger {
 
     }
 
-    public static String postHttpRequestWithHeader(JSONObject object, String url) {
+    public static String postHttpRequestWithHeader(JSONObject object, Map<String, String> map, String url) {
 
         String responseString = null;
 
@@ -60,8 +63,12 @@ public class RequestManger {
             Log.d("json", message);
             p.setEntity(new StringEntity(message, "UTF8"));
             p.setHeader("Content-type", "application/json");
-            p.setHeader(APIKEY, APIKEYVALUE);
-            p.setHeader(REQUESTERKEY, REQUESTERVALUE);
+
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                p.setHeader(key, value);
+            }
 
             HttpResponse response = hc.execute(p);
             Log.d("Status line", "" + response.getStatusLine().getStatusCode());

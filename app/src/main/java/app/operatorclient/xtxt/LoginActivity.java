@@ -15,6 +15,9 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
 import app.operatorclient.xtxt.Requestmanager.Utils;
 
@@ -23,11 +26,20 @@ public class LoginActivity extends Activity {
 
     TextView loginTextView;
     EditText usernameEdittext, passwordEdittext;
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        prefs = getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE);
+        String sessionid = prefs.getString(RequestManger.Constantas.SESSIONID, "");
+        if (!TextUtils.isEmpty(sessionid)) {
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish();
+        }
 
         usernameEdittext = (EditText) findViewById(R.id.usernameEdittext);
         passwordEdittext = (EditText) findViewById(R.id.passwordEdittext);
@@ -89,7 +101,11 @@ public class LoginActivity extends Activity {
                 object.put("app_version", Utils.getAppVer(LoginActivity.this));
                 object.put("android_version", Utils.getAndroidVer());
 
-                response = RequestManger.postHttpRequestWithHeader(object, RequestManger.HOST + "login");
+                Map<String, String> map = new HashMap<String, String>();
+                map.put(RequestManger.APIKEY, RequestManger.APIKEYVALUE);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTERVALUE);
+
+                response = RequestManger.postHttpRequestWithHeader(object, map, RequestManger.HOST + "login");
 
 
             } catch (Exception ex) {
@@ -118,7 +134,7 @@ public class LoginActivity extends Activity {
                     String name = dataJSON.getString(NAME);
                     String mod = dataJSON.getString(MESSAGEOFTHEDAY);
 
-                    SharedPreferences.Editor editor = getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE).edit();
+                    SharedPreferences.Editor editor = prefs.edit();
                     editor.putString(USERID, uid);
                     editor.putString(SESSIONID, sessionid);
                     editor.putString(NAME, name);

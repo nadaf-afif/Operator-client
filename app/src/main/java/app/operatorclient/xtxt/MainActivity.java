@@ -1,10 +1,15 @@
 package app.operatorclient.xtxt;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -21,10 +26,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
+import app.operatorclient.xtxt.Requestmanager.Utils;
 import app.operatorclient.xtxt.adapter.NavDrawerListAdapter;
 
 /**
@@ -113,7 +124,24 @@ public class MainActivity extends ActionBarActivity {
             case 1:
 
                 break;
+            case 4:
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Are you sure you want to logout?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                new LogoutAsynctask().execute();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+                break;
             default:
                 break;
         }
@@ -174,4 +202,45 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    class LogoutAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String response = "";
+
+            JSONObject object = new JSONObject();
+            try {
+                Map<String, String> map = new HashMap<String, String>();
+                String sessionid = prefs.getString(RequestManger.Constantas.SESSIONID, "");
+                map.put(RequestManger.APIKEY, sessionid);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTERADMIN);
+
+                response = RequestManger.postHttpRequestWithHeader(object, map, RequestManger.HOST + "logout");
+
+                Utils.clearPreferences(MainActivity.this);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
+    }
 }
