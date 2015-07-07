@@ -124,6 +124,9 @@ public class MainActivity extends ActionBarActivity {
             case 1:
 
                 break;
+            case 2:
+                fragment = new StataticsFragment();
+                break;
             case 4:
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -237,7 +240,7 @@ public class MainActivity extends ActionBarActivity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         }

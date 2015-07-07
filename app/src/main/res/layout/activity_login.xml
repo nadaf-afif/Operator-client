@@ -109,6 +109,7 @@
                 android:padding="10dp"
                 android:hint="Password"
                 android:singleLine="true"
+                android:inputType="textPassword"
                 android:textSize="16dp"
                 android:textColorHint="@color/grayhint"
                 android:background="@null" />

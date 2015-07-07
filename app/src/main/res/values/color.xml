@@ -6,5 +6,6 @@
     <color name="gray">#A1A1A1</color>
     <color name="grayhint">#c1c1c1</color>
     <color name="green">#3AC45F</color>
+    <color name="stats">#E4E3F5</color>
 
 </resources>

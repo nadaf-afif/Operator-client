@@ -147,7 +147,7 @@ public class LoginActivity extends Activity {
 
                 } else {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
-                    String message = dataJSON.getString("message");
+                    String message = dataJSON.getString(MESSAGE);
                     Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                 }
 

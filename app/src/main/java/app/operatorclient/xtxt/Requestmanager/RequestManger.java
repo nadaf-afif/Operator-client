@@ -46,6 +46,7 @@ public class RequestManger {
         public static final String SESSIONID = "session_id";
         public static final String NAME = "name";
         public static final String MESSAGEOFTHEDAY = "message_of_the_day";
+        public static final String MESSAGE = "message";
 
     }
 
