@@ -6,20 +6,14 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,6 +41,14 @@ public class RequestManger {
         public static final String NAME = "name";
         public static final String MESSAGEOFTHEDAY = "message_of_the_day";
         public static final String MESSAGE = "message";
+
+        public static final String MOBILE = "mobile";
+        public static final String USERNAME = "username";
+        public static final String EMAIL = "email";
+        public static final String NAMEATA = "name";
+        public static final String PIN = "pin";
+        public static final String TIMEZONETITLE = "timezone_title";
+        public static final String TIMEZONENAME = "timezone_name";
 
     }
 
@@ -79,6 +81,36 @@ public class RequestManger {
             e.printStackTrace();
         }
         Log.d("RESPONSE POST", responseString + " ");
+        return responseString;
+
+    }
+
+
+    public static String getHttpRequestWithHeader(Map<String, String> map, String url) {
+
+        String responseString = null;
+
+        try {
+
+            HttpClient hc = new DefaultHttpClient();
+
+            HttpGet p = new HttpGet(url);
+            p.setHeader("Content-type", "application/json");
+
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                p.setHeader(key, value);
+            }
+
+            HttpResponse response = hc.execute(p);
+            Log.d("Status line", "" + response.getStatusLine().getStatusCode());
+            responseString = EntityUtils.toString(response.getEntity());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Log.d("RESPONSE GET", responseString + " ");
         return responseString;
 
     }
