@@ -12,6 +12,7 @@
         android:layout_height="wrap_content">
 
         <ImageButton
+            android:id="@+id/logout"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/signout_icon"
@@ -41,12 +42,39 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/black"
+            android:layout_weight="1"
             android:textSize="14dp"
             android:drawableLeft="@drawable/users_icon"
             android:drawablePadding="5dp"
             android:layout_margin="20dp"
             android:text="Users" />
 
+        <View
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:background="@color/grayhint" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="14dp"
+            android:drawableLeft="@drawable/time_icon"
+            android:drawablePadding="5dp"
+            android:layout_margin="20dp"
+            android:text="Time" />
+
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/grayhint" />
+
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/white" />
 
 </LinearLayout>

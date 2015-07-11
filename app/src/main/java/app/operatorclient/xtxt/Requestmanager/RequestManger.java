@@ -30,6 +30,8 @@ public class RequestManger {
     public static final String REQUESTERVALUE = "xtxt-app-global";
     public static final String REQUESTERADMIN = "xtxt-app-admin";
 
+    public static final String REQUESTEROPERATOR = "xtxt-app-operator";
+
 
     public static final String PREFERENCES = "appPreferences";
 
