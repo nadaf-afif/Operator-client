@@ -1,10 +1,12 @@
 package app.operatorclient.xtxt;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,13 +25,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import app.operatorclient.xtxt.Requestmanager.Customer;
+import app.operatorclient.xtxt.Requestmanager.LogoutAsynctask;
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
+import app.operatorclient.xtxt.Requestmanager.Utils;
 
 /**
  * Created by kiran on 11/7/15.
@@ -38,6 +41,7 @@ public class WaitingqueueActivity extends Activity {
 
     ImageButton logout;
     ListView listview;
+    CustomAdapter adapter;
     SharedPreferences prefs;
 
     @Override
@@ -50,6 +54,27 @@ public class WaitingqueueActivity extends Activity {
         logout = (ImageButton) findViewById(R.id.logout);
         listview = (ListView) findViewById(R.id.listview);
 
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(WaitingqueueActivity.this);
+                builder.setMessage("Are you sure you want to logout?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                new LogoutAsynctask(WaitingqueueActivity.this).execute();
+                            }
+                        })
+                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
 
         new GetWaitingQueueAsynctask().execute();
 
@@ -111,6 +136,9 @@ public class WaitingqueueActivity extends Activity {
 
                     List<Customer> customers = gson.fromJson(customerArray.toString(), listType);
 
+                    adapter = new CustomAdapter(customers);
+                    listview.setAdapter(adapter);
+
 
                 } else {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
@@ -129,25 +157,18 @@ public class WaitingqueueActivity extends Activity {
 
     public class CustomAdapter extends BaseAdapter {
 
-        private ArrayList data;
+        private List<Customer> data;
         private LayoutInflater inflater = null;
-        public Resources res;
-        int i = 0;
 
+        public CustomAdapter(List<Customer> data) {
 
-        public CustomAdapter(ArrayList d, Resources resLocal) {
-
-            data = d;
-            res = resLocal;
-
+            this.data = data;
             inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         }
 
         public int getCount() {
 
-            if (data.size() <= 0)
-                return 1;
             return data.size();
         }
 
@@ -170,21 +191,19 @@ public class WaitingqueueActivity extends Activity {
                 vi = inflater.inflate(R.layout.listitem, null);
 
                 holder = new ViewHolder();
-                holder.text = (TextView) vi.findViewById(R.id.text);
+                holder.nameTextView = (TextView) vi.findViewById(R.id.name);
+                holder.timeTextView = (TextView) vi.findViewById(R.id.time);
+
                 vi.setTag(holder);
             } else
                 holder = (ViewHolder) vi.getTag();
 
-            if (data.size() <= 0) {
-                holder.text.setText("No Data");
 
-            } else {
-                tempValues = null;
-                tempValues = (ListModel) data.get(position);
+            Customer customer = data.get(position);
 
-                holder.text.setText(tempValues.getCompanyName());
+            holder.nameTextView.setText(customer.getCustomer_name());
+            holder.timeTextView.setText(Utils.dateDiff(customer.getCreated()));
 
-            }
             return vi;
         }
 
@@ -193,12 +212,10 @@ public class WaitingqueueActivity extends Activity {
 
     static class ViewHolder {
 
-        public TextView text;
-        public TextView text1;
-        public TextView textWide;
-        public ImageView image;
+        public TextView nameTextView, timeTextView;
 
     }
+
 
 
 }

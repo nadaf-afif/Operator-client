@@ -31,6 +31,13 @@ public class DashboardFragment extends Fragment {
         SharedPreferences prefs = getActivity().getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE);
         modTextview.setText(prefs.getString(RequestManger.Constantas.MESSAGEOFTHEDAY, ""));
 
+        chatTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) getActivity()).startSession();
+            }
+        });
+
         return rootView;
     }
 

@@ -5,6 +5,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Created by mac on 04/07/15.
  */
@@ -37,4 +41,70 @@ public class Utils {
         SharedPreferences prefs = context.getSharedPreferences(RequestManger.PREFERENCES, Context.MODE_PRIVATE);
         prefs.edit().clear().commit();
     }
+
+    public static String dateDiff(String datestring) {
+
+        Date date = getDate(datestring);
+
+
+        long oldMillis = date.getTime();
+        long currMillis = System.currentTimeMillis();
+        String msg = null;
+        long diff = java.lang.Math.abs(currMillis - oldMillis);
+        long temp = diff / 60000;
+        if (temp >= 60) {
+            temp = temp / 60;
+            if (temp >= 24) {
+                temp = temp / 24;
+                if (temp > 30) {
+                    temp = temp / 30;
+                    if (temp > 12) {
+                        temp = temp / 12;
+                        if (temp == 1) {
+                            msg = temp + " yr ago";
+                        } else {
+                            msg = temp + " yrs ago";
+                        }
+                    } else {
+                        if (temp == 1) {
+                            msg = temp + " mnth ago";
+                        } else {
+                            msg = temp + " mnths ago";
+                        }
+                    }
+                } else {
+                    if (temp == 1) {
+                        msg = temp + " day ago";
+                    } else {
+                        msg = temp + " days ago";
+                    }
+                }
+            } else {
+                if (temp == 1) {
+                    msg = temp + " hr ago";
+                } else {
+                    msg = temp + " hrs ago";
+                }
+            }
+        } else {
+            if (temp == 1) {
+                msg = temp + " mn ago";
+            } else {
+                msg = temp + " mns ago";
+            }
+        }
+        return msg;
+    }
+
+    public static Date getDate(String date) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat(
+                "yyyy-MM-dd HH:mm:ss");
+        Date parsed = null;
+        try {
+            parsed = inputFormat.parse(date);
+        } catch (ParseException e) {
+        }
+        return parsed;
+    }
+
 }

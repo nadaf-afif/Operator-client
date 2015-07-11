@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import app.operatorclient.xtxt.Requestmanager.LogoutAsynctask;
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
-import app.operatorclient.xtxt.Requestmanager.Utils;
 import app.operatorclient.xtxt.adapter.NavDrawerListAdapter;
 
 /**
@@ -137,7 +137,7 @@ public class MainActivity extends ActionBarActivity {
                         .setCancelable(false)
                         .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                new LogoutAsynctask().execute();
+                                new LogoutAsynctask(MainActivity.this).execute();
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -208,46 +208,8 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    class LogoutAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            String response = "";
-
-            JSONObject object = new JSONObject();
-            try {
-                Map<String, String> map = new HashMap<String, String>();
-                String sessionid = prefs.getString(RequestManger.Constantas.SESSIONID, "");
-                map.put(RequestManger.APIKEY, sessionid);
-                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTERADMIN);
-
-                response = RequestManger.postHttpRequestWithHeader(object, map, RequestManger.HOST + "logout");
-
-                Utils.clearPreferences(MainActivity.this);
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-            return response;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-            finish();
-        }
-
+    public void startSession() {
+        new StartSessionAsynctask().execute();
     }
 
     class StartSessionAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
@@ -306,7 +268,7 @@ public class MainActivity extends ActionBarActivity {
                     editor.apply();
 
                     Intent intent = new Intent(MainActivity.this, WaitingqueueActivity.class);
-                    startActivity(intent);
+                    startActivityForResult(intent, 1);
 
                 } else {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
@@ -320,6 +282,16 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                this.finish();
+            }
+        }
     }
 
 }
