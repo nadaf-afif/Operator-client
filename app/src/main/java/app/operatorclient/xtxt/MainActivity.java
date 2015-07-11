@@ -1,6 +1,7 @@
 package app.operatorclient.xtxt;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -124,6 +126,9 @@ public class MainActivity extends ActionBarActivity {
                 break;
             case 2:
                 fragment = new StataticsFragment();
+                break;
+            case 3:
+                new StartSessionAsynctask().execute();
                 break;
             case 4:
 
@@ -244,4 +249,77 @@ public class MainActivity extends ActionBarActivity {
         }
 
     }
+
+    class StartSessionAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String response = "";
+
+            JSONObject object = new JSONObject();
+            try {
+
+                Map<String, String> map = new HashMap<String, String>();
+                String sessionid = prefs.getString(RequestManger.Constantas.SESSIONID, "");
+                map.put(RequestManger.APIKEY, sessionid);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTERADMIN);
+
+                response = RequestManger.postHttpRequestWithHeader(object, map, RequestManger.HOST + "start_session");
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+            try {
+                JSONObject responseJSON = new JSONObject(result);
+                boolean error = responseJSON.getBoolean(ERROR);
+
+                if (!error) {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+
+                    String authkey = dataJSON.getString(AUTHKEY);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(AUTHKEY, authkey);
+                    editor.apply();
+
+                    Intent intent = new Intent(MainActivity.this, WaitingqueueActivity.class);
+                    startActivity(intent);
+
+                } else {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    String message = dataJSON.getString(MESSAGE);
+                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Toast.makeText(MainActivity.this, "Unable to get data.", Toast.LENGTH_LONG).show();
+            }
+        }
+
+    }
+
 }

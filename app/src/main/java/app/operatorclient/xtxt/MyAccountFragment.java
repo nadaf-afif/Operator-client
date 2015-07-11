@@ -52,12 +52,13 @@ public class MyAccountFragment extends Fragment implements RequestManger.Constan
         String email = prefs.getString(EMAIL, "");
         String name = prefs.getString(NAMEATA, "");
         String pin = prefs.getString(PIN, "");
+        String operatorid = prefs.getString(OPERATORID, "");
         String timezone_title = prefs.getString(TIMEZONETITLE, "");
         String timezone_name = prefs.getString(TIMEZONENAME, "");
 
         nameTextview.setText(name);
         usernameTextview.setText(username);
-        operatoridTextview.setText(uid);
+        operatoridTextview.setText(operatorid);
         pinTextview.setText(pin);
         emailTextview.setText(email);
         mobileTextview.setText(mobile);
@@ -123,6 +124,7 @@ public class MyAccountFragment extends Fragment implements RequestManger.Constan
                     String email = dataJSON.getString(EMAIL);
                     String name = dataJSON.getString(NAMEATA);
                     String pin = dataJSON.getString(PIN);
+                    String operatorid = dataJSON.getString(OPERATORID);
                     String timezone_title = dataJSON.getString(TIMEZONETITLE);
                     String timezone_name = dataJSON.getString(TIMEZONENAME);
 
@@ -133,6 +135,7 @@ public class MyAccountFragment extends Fragment implements RequestManger.Constan
                     editor.putString(EMAIL, email);
                     editor.putString(NAMEATA, name);
                     editor.putString(PIN, pin);
+                    editor.putString(OPERATORID, operatorid);
                     editor.putString(TIMEZONETITLE, timezone_title);
                     editor.putString(TIMEZONENAME, timezone_name);
                     editor.apply();
@@ -140,6 +143,7 @@ public class MyAccountFragment extends Fragment implements RequestManger.Constan
                     nameTextview.setText(name);
                     usernameTextview.setText(username);
                     pinTextview.setText(pin);
+                    operatoridTextview.setText(operatorid);
                     emailTextview.setText(email);
                     mobileTextview.setText(mobile);
                     timezoneTextview.setText(timezone_title);

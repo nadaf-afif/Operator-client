@@ -47,8 +47,11 @@ public class RequestManger {
         public static final String EMAIL = "email";
         public static final String NAMEATA = "name";
         public static final String PIN = "pin";
+        public static final String OPERATORID = "operator_id";
         public static final String TIMEZONETITLE = "timezone_title";
         public static final String TIMEZONENAME = "timezone_name";
+
+        public static final String AUTHKEY = "auth_key";
 
     }
 
