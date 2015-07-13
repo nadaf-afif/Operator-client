@@ -1,7 +1,9 @@
 package app.operatorclient.xtxt;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
+import app.operatorclient.xtxt.Requestmanager.Utils;
 
 /**
  * Created by yogi on 8/7/15.
@@ -152,6 +155,13 @@ public class MyAccountFragment extends Fragment implements RequestManger.Constan
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     String message = dataJSON.getString(MESSAGE);
                     Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+
+                    Utils.clearPreferences(getActivity());
+                    Activity activity = getActivity();
+                    activity.setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(activity, LoginActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
                 }
 
             } catch (Exception ex) {

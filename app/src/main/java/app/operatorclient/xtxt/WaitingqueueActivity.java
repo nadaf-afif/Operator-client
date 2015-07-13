@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -129,6 +128,7 @@ public class WaitingqueueActivity extends Activity {
                 if (!error) {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     JSONArray customerArray = dataJSON.getJSONArray(MESSAGE);
+                    String currenttime = dataJSON.getString(CURRENTTIME);
 
                     Gson gson = new Gson();
                     Type listType = new TypeToken<List<Customer>>() {
@@ -136,7 +136,7 @@ public class WaitingqueueActivity extends Activity {
 
                     List<Customer> customers = gson.fromJson(customerArray.toString(), listType);
 
-                    adapter = new CustomAdapter(customers);
+                    adapter = new CustomAdapter(customers, currenttime);
                     listview.setAdapter(adapter);
 
 
@@ -159,10 +159,12 @@ public class WaitingqueueActivity extends Activity {
 
         private List<Customer> data;
         private LayoutInflater inflater = null;
+        String currenttime;
 
-        public CustomAdapter(List<Customer> data) {
+        public CustomAdapter(List<Customer> data, String currenttime) {
 
             this.data = data;
+            this.currenttime = currenttime;
             inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         }
@@ -202,7 +204,7 @@ public class WaitingqueueActivity extends Activity {
             Customer customer = data.get(position);
 
             holder.nameTextView.setText(customer.getCustomer_name());
-            holder.timeTextView.setText(Utils.dateDiff(customer.getCreated()));
+            holder.timeTextView.setText(Utils.dateDiff(currenttime, customer.getCreated()));
 
             return vi;
         }
@@ -215,7 +217,6 @@ public class WaitingqueueActivity extends Activity {
         public TextView nameTextView, timeTextView;
 
     }
-
 
 
 }

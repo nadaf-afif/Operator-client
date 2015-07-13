@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
 
@@ -34,7 +35,13 @@ public class DashboardFragment extends Fragment {
         chatTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity) getActivity()).startSession();
+
+                if (RequestManger.isConnectedToInternet(getActivity())) {
+                    ((MainActivity) getActivity()).startSession();
+                } else {
+                    Toast.makeText(getActivity(), "Please check Internet Connection.", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
 

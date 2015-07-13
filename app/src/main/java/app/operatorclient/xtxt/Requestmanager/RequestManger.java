@@ -43,6 +43,7 @@ public class RequestManger {
         public static final String NAME = "name";
         public static final String MESSAGEOFTHEDAY = "message_of_the_day";
         public static final String MESSAGE = "message";
+        public static final String CURRENTTIME = "current_time";
 
         public static final String MOBILE = "mobile";
         public static final String USERNAME = "username";

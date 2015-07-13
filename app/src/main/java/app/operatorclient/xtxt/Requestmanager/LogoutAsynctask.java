@@ -44,8 +44,6 @@ public class LogoutAsynctask extends AsyncTask<String, Void, String> implements 
 
             response = RequestManger.postHttpRequestWithHeader(object, map, RequestManger.HOST + "logout");
 
-            Utils.clearPreferences(context);
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -55,6 +53,8 @@ public class LogoutAsynctask extends AsyncTask<String, Void, String> implements 
     @Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+
+        Utils.clearPreferences(context);
 
         Activity activity = (Activity) context;
         activity.setResult(Activity.RESULT_OK);

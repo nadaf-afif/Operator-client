@@ -1,5 +1,6 @@
 package app.operatorclient.xtxt;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -36,6 +37,7 @@ import java.util.Map;
 
 import app.operatorclient.xtxt.Requestmanager.LogoutAsynctask;
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
+import app.operatorclient.xtxt.Requestmanager.Utils;
 import app.operatorclient.xtxt.adapter.NavDrawerListAdapter;
 
 /**
@@ -128,7 +130,11 @@ public class MainActivity extends ActionBarActivity {
                 fragment = new StataticsFragment();
                 break;
             case 3:
-                new StartSessionAsynctask().execute();
+                if (RequestManger.isConnectedToInternet(MainActivity.this)) {
+                    new StartSessionAsynctask().execute();
+                } else {
+                    Toast.makeText(MainActivity.this, "Please check Internet Connection.", Toast.LENGTH_LONG).show();
+                }
                 break;
             case 4:
 
@@ -274,6 +280,13 @@ public class MainActivity extends ActionBarActivity {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     String message = dataJSON.getString(MESSAGE);
                     Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+
+                    Utils.clearPreferences(MainActivity.this);
+                    setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+
                 }
 
             } catch (Exception ex) {

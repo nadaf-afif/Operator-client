@@ -42,16 +42,19 @@ public class Utils {
         prefs.edit().clear().commit();
     }
 
-    public static String dateDiff(String datestring) {
+    public static String dateDiff(String currenttime, String datestring) {
 
         Date date = getDate(datestring);
+        Date currentDate = getDate(currenttime);
 
 
         long oldMillis = date.getTime();
-        long currMillis = System.currentTimeMillis();
+        long currMillis = currentDate.getTime();
         String msg = null;
         long diff = java.lang.Math.abs(currMillis - oldMillis);
         long temp = diff / 60000;
+        long seconds = diff / 1000;
+
         if (temp >= 60) {
             temp = temp / 60;
             if (temp >= 24) {
@@ -80,18 +83,20 @@ public class Utils {
                     }
                 }
             } else {
-                if (temp == 1) {
-                    msg = temp + " hr ago";
-                } else {
-                    msg = temp + " hrs ago";
-                }
+//                if (temp == 1) {
+//                    msg = temp + " hr ago";
+//                } else {
+//                    msg = temp + " hrs ago";
+//                }
+                msg = String.format("%02dm %02ds", seconds / 60, seconds % 60);
             }
         } else {
-            if (temp == 1) {
-                msg = temp + " mn ago";
-            } else {
-                msg = temp + " mns ago";
-            }
+//            if (temp == 1) {
+//                msg = temp + " mn ago";
+//            } else {
+//                msg = temp + " mns ago";
+//            }
+            msg = String.format("%02dm %02ds", seconds / 60, seconds % 60);
         }
         return msg;
     }

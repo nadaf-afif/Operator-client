@@ -1,5 +1,6 @@
 package app.operatorclient.xtxt;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -9,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +20,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -226,6 +225,13 @@ public class StataticsFragment extends Fragment {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     String message = dataJSON.getString(MESSAGE);
                     Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+
+                    Utils.clearPreferences(getActivity());
+                    Activity activity = getActivity();
+                    activity.setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(activity, LoginActivity.class);
+                    activity.startActivity(intent);
+                    activity.finish();
                 }
 
             } catch (Exception ex) {
