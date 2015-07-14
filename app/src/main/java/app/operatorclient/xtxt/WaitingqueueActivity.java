@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -169,6 +170,13 @@ public class WaitingqueueActivity extends Activity {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     String message = dataJSON.getString(MESSAGE);
                     Toast.makeText(WaitingqueueActivity.this, message, Toast.LENGTH_LONG).show();
+
+
+                    Utils.clearPreferences(WaitingqueueActivity.this);
+                    setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(WaitingqueueActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
 
             } catch (Exception ex) {
