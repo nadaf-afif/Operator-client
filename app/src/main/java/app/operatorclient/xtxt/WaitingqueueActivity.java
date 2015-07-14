@@ -43,6 +43,9 @@ public class WaitingqueueActivity extends Activity {
     CustomAdapter adapter;
     SharedPreferences prefs;
 
+    boolean isOpen = false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,8 +78,25 @@ public class WaitingqueueActivity extends Activity {
             }
         });
 
-        new GetWaitingQueueAsynctask().execute();
 
+        if (RequestManger.isConnectedToInternet(WaitingqueueActivity.this)) {
+            new GetWaitingQueueAsynctask().execute();
+        } else {
+            Toast.makeText(WaitingqueueActivity.this, "Please check Internet Connection.", Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isOpen = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        isOpen = false;
     }
 
     class GetWaitingQueueAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
@@ -85,9 +105,11 @@ public class WaitingqueueActivity extends Activity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            progressDialog = new ProgressDialog(WaitingqueueActivity.this);
-            progressDialog.setMessage("Please wait...");
-            progressDialog.show();
+            if (adapter == null) {
+                progressDialog = new ProgressDialog(WaitingqueueActivity.this);
+                progressDialog.setMessage("Please wait...");
+                progressDialog.show();
+            }
         }
 
         @Override
@@ -139,6 +161,9 @@ public class WaitingqueueActivity extends Activity {
                     adapter = new CustomAdapter(customers, currenttime);
                     listview.setAdapter(adapter);
 
+                    if (RequestManger.isConnectedToInternet(WaitingqueueActivity.this) && isOpen) {
+                        new GetWaitingQueueAsynctask().execute();
+                    }
 
                 } else {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
