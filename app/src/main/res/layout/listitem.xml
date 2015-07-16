@@ -6,6 +6,7 @@
     android:layout_height="wrap_content">
 
     <View
+        android:id="@+id/view"
         android:layout_width="5dp"
         android:layout_height="fill_parent"
         android:background="#DF005C" />

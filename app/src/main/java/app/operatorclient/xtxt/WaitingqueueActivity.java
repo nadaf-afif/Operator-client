@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -228,6 +229,7 @@ public class WaitingqueueActivity extends Activity {
                 holder = new ViewHolder();
                 holder.nameTextView = (TextView) vi.findViewById(R.id.name);
                 holder.timeTextView = (TextView) vi.findViewById(R.id.time);
+                holder.view = (View) vi.findViewById(R.id.view);
 
                 vi.setTag(holder);
             } else
@@ -239,6 +241,8 @@ public class WaitingqueueActivity extends Activity {
             holder.nameTextView.setText(customer.getCustomer_name());
             holder.timeTextView.setText(Utils.dateDiff(currenttime, customer.getCreated()));
 
+            setColor(Utils.dateDiffVal(currenttime, customer.getCreated()), holder.view, vi);
+
             return vi;
         }
 
@@ -248,6 +252,23 @@ public class WaitingqueueActivity extends Activity {
     static class ViewHolder {
 
         public TextView nameTextView, timeTextView;
+        public View view;
+
+    }
+
+    private void setColor(int diff, View view, View bg) {
+
+        if (diff >= 5) {
+            view.setBackgroundColor(Color.parseColor("#e91e63"));
+            bg.setBackgroundColor(Color.parseColor("#f6e2e9"));
+        } else if (diff >= 3) {
+            view.setBackgroundColor(Color.parseColor("#ffA500"));
+            bg.setBackgroundColor(Color.parseColor("#f9f2df"));
+        } else {
+            view.setBackgroundColor(Color.parseColor("#f5f5f5"));
+            bg.setBackgroundColor(Color.parseColor("#f5f5f5"));
+        }
+
 
     }
 

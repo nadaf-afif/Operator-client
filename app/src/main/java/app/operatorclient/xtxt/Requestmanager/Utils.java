@@ -42,6 +42,21 @@ public class Utils {
         prefs.edit().clear().commit();
     }
 
+
+    public static int dateDiffVal(String currenttime, String datestring) {
+        Date date = getDate(datestring);
+        Date currentDate = getDate(currenttime);
+
+
+        long oldMillis = date.getTime();
+        long currMillis = currentDate.getTime();
+        long diff = java.lang.Math.abs(currMillis - oldMillis);
+
+        int ret = (int) (diff / 1000);
+
+        return ret;
+    }
+
     public static String dateDiff(String currenttime, String datestring) {
 
         Date date = getDate(datestring);
