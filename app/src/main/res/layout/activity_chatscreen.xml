@@ -65,17 +65,11 @@
                 android:textSize="18dp"
                 android:ellipsize="end"
                 android:singleLine="true"
+                android:drawableRight="@drawable/user_info_icon"
+                android:drawablePadding="5dp"
                 android:layout_gravity="center_vertical"
                 android:textColor="@color/black"
                 android:text="customer name" />
-
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/user_info_icon"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp"
-                android:background="@null" />
 
         </LinearLayout>
 
@@ -127,6 +121,7 @@
         android:background="@color/grayhint" />
 
     <LinearLayout
+        android:id="@+id/sendLinearlayout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="60dp">
@@ -135,7 +130,7 @@
             android:id="@+id/media"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/time_icon"
+            android:src="@drawable/add_media"
             android:layout_gravity="center"
             android:background="@null" />
 
@@ -154,7 +149,7 @@
             android:id="@+id/send"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:src="@drawable/time_icon"
+            android:src="@drawable/send_message"
             android:layout_gravity="center"
             android:background="@null" />
 

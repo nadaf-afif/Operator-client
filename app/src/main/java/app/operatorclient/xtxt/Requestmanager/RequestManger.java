@@ -56,6 +56,14 @@ public class RequestManger {
 
         public static final String AUTHKEY = "auth_key";
 
+        public static final String CUSTOMER = "customer";
+        public static final String PERSONA = "persona";
+        public static final String PROFILEPIC = "profile_pic_100x100";
+        public static final String SENDSMS = "send_sms";
+        public static final String REPLTOP = "reply_op";
+        public static final String DOB = "date_of_birth";
+        public static final String COLOR = "colour";
+
     }
 
     public static String postHttpRequestWithHeader(JSONObject object, Map<String, String> map, String url) {

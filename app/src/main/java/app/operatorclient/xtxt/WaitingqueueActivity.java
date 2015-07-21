@@ -154,6 +154,10 @@ public class WaitingqueueActivity extends Activity {
                     JSONArray customerArray = dataJSON.getJSONArray(MESSAGE);
                     String currenttime = dataJSON.getString(CURRENTTIME);
 
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString(CURRENTTIME, currenttime);
+                    editor.apply();
+
                     Gson gson = new Gson();
                     Type listType = new TypeToken<List<Customer>>() {
                     }.getType();
@@ -236,7 +240,7 @@ public class WaitingqueueActivity extends Activity {
                 holder = (ViewHolder) vi.getTag();
 
 
-            Customer customer = data.get(position);
+            final Customer customer = data.get(position);
 
             holder.nameTextView.setText(customer.getCustomer_name());
             holder.timeTextView.setText(Utils.dateDiff(currenttime, customer.getCreated()));
@@ -246,8 +250,8 @@ public class WaitingqueueActivity extends Activity {
             vi.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(WaitingqueueActivity.this, ChatScreenActivity.class);
-                    startActivityForResult(intent, 1);
+
+                    new ChatAsynctask().execute(customer.getCustomer_id());
                 }
             });
 
@@ -277,6 +281,79 @@ public class WaitingqueueActivity extends Activity {
             bg.setBackgroundColor(Color.parseColor("#f5f5f5"));
         }
 
+
+    }
+
+    class ChatAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(WaitingqueueActivity.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String response = "";
+
+            try {
+
+                Map<String, String> map = new HashMap<String, String>();
+                String authkey = prefs.getString(AUTHKEY, "");
+                map.put(RequestManger.APIKEY, authkey);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTEROPERATOR);
+
+                response = RequestManger.getHttpRequestWithHeader(map, RequestManger.HOST + "chat/" + params[0]);
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+
+            try {
+                JSONObject responseJSON = new JSONObject(result);
+                boolean error = responseJSON.getBoolean(ERROR);
+
+                if (!error) {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    Intent intent = new Intent(WaitingqueueActivity.this, ChatScreenActivity.class);
+                    intent.putExtra(DATA, dataJSON.toString());
+                    startActivityForResult(intent, 1);
+                } else {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    String message = dataJSON.getString(MESSAGE);
+                    Toast.makeText(WaitingqueueActivity.this, message, Toast.LENGTH_LONG).show();
+
+
+                    Utils.clearPreferences(WaitingqueueActivity.this);
+                    setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(WaitingqueueActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Toast.makeText(WaitingqueueActivity.this, "Unable to get data.", Toast.LENGTH_LONG).show();
+            }
+
+        }
 
     }
 

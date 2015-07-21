@@ -123,6 +123,20 @@ public class Utils {
         try {
             parsed = inputFormat.parse(date);
         } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return parsed;
+    }
+
+
+    public static Date getDOBDate(String date) {
+        SimpleDateFormat inputFormat = new SimpleDateFormat(
+                "yyyy-MM-dd");
+        Date parsed = null;
+        try {
+            parsed = inputFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
         return parsed;
     }
