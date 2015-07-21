@@ -7,23 +7,31 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import app.operatorclient.xtxt.Requestmanager.CircularImageView;
 import app.operatorclient.xtxt.Requestmanager.LogoutAsynctask;
+import app.operatorclient.xtxt.Requestmanager.Message;
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
 import app.operatorclient.xtxt.Requestmanager.Utils;
 
@@ -34,6 +42,7 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
 
     ImageButton logout, changePersona, media, send;
     ListView listview;
+    CustomAdapter adapter;
     CircularImageView customerPic, personaPic;
     TextView customerName, personaName;
     EditText messageEdittext;
@@ -153,9 +162,92 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             String color = customerJSON.getString(COLOR);
             listview.setBackgroundColor(Color.parseColor("#" + color));
 
+            JSONArray messagesArray = dataJSON.getJSONArray(MESSAGES);
+
+            ArrayList<Message> msgArrayList = Utils.parseMsg(messagesArray);
+            adapter = new CustomAdapter(msgArrayList);
+            listview.setAdapter(adapter);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+    }
+
+    public class CustomAdapter extends BaseAdapter {
+
+        private List<Message> data;
+        private LayoutInflater inflater = null;
+        String currenttime;
+
+        public CustomAdapter(List<Message> data) {
+
+            this.data = data;
+            currenttime = prefs.getString(CURRENTTIME, "");
+            inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        }
+
+        public int getCount() {
+
+            return data.size();
+        }
+
+        public Object getItem(int position) {
+            return position;
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
+
+
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            View vi = convertView;
+            ViewHolder holder;
+
+            if (convertView == null) {
+
+                vi = inflater.inflate(R.layout.listitem_msg, null);
+
+                holder = new ViewHolder();
+
+                holder.received = (RelativeLayout) vi.findViewById(R.id.received);
+                holder.sent = (RelativeLayout) vi.findViewById(R.id.sent);
+                holder.recMsg = (TextView) vi.findViewById(R.id.msg);
+                holder.recTime = (TextView) vi.findViewById(R.id.recTime);
+                holder.sentMsg = (TextView) vi.findViewById(R.id.sentMsg);
+                holder.sentTime = (TextView) vi.findViewById(R.id.sentTime);
+
+                vi.setTag(holder);
+            } else
+                holder = (ViewHolder) vi.getTag();
+
+
+            final Message message = data.get(position);
+            if (message.getType().equalsIgnoreCase("mo")) {
+                holder.received.setVisibility(View.VISIBLE);
+                holder.sent.setVisibility(View.GONE);
+                holder.recMsg.setText(message.getMessage());
+                holder.recTime.setText(Utils.dateDiff(currenttime, message.getCreated()));
+            } else {
+                holder.received.setVisibility(View.GONE);
+                holder.sent.setVisibility(View.VISIBLE);
+                holder.sentMsg.setText(message.getMessage());
+                holder.sentTime.setText(Utils.dateDiff(currenttime, message.getCreated()));
+            }
+
+
+            return vi;
+        }
+
+    }
+
+
+    static class ViewHolder {
+        public RelativeLayout received, sent;
+        public TextView recMsg, recTime, sentMsg, sentTime;
 
     }
 }

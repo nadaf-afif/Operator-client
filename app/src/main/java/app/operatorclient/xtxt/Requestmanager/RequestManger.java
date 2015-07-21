@@ -63,6 +63,7 @@ public class RequestManger {
         public static final String REPLTOP = "reply_op";
         public static final String DOB = "date_of_birth";
         public static final String COLOR = "colour";
+        public static final String MESSAGES = "messages";
 
     }
 

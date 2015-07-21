@@ -5,8 +5,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -139,6 +143,34 @@ public class Utils {
             e.printStackTrace();
         }
         return parsed;
+    }
+
+    public static ArrayList<Message> parseMsg(JSONArray messagesArray) {
+        ArrayList<Message> msgArrayList = new ArrayList<>();
+        Message msg;
+        try {
+            for (int i = 0; i < messagesArray.length(); i++) {
+                JSONObject jsonobject = (JSONObject) messagesArray.get(i);
+                String message_id = jsonobject.getString("message_id");
+                String message = jsonobject.getString("message");
+                String created = jsonobject.getString("created");
+                String type = jsonobject.getString("type");
+                String status = jsonobject.getString("status");
+
+                JSONObject visual_content = null;
+                Object visOBJ = jsonobject.get("visual_content");
+                if (visOBJ instanceof JSONObject) {
+                    visual_content = (JSONObject) visOBJ;
+                }
+                msg = new Message(message_id, message, created, type, status, visual_content);
+
+                msgArrayList.add(msg);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return msgArrayList;
     }
 
 }
