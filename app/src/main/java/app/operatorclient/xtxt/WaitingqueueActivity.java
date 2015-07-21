@@ -243,6 +243,14 @@ public class WaitingqueueActivity extends Activity {
 
             setColor(Utils.dateDiffVal(currenttime, customer.getCreated()), holder.view, vi);
 
+            vi.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(WaitingqueueActivity.this, ChatScreenActivity.class);
+                    startActivityForResult(intent, 1);
+                }
+            });
+
             return vi;
         }
 
@@ -272,5 +280,15 @@ public class WaitingqueueActivity extends Activity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                setResult(Activity.RESULT_OK);
+                this.finish();
+            }
+        }
+    }
 
 }
