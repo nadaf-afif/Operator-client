@@ -142,6 +142,8 @@ public class StataticsFragment extends Fragment {
             super.onPreExecute();
             progressDialog = new ProgressDialog(getActivity());
             progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
         }
 

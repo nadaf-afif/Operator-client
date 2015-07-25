@@ -83,15 +83,15 @@ public class Utils {
                     if (temp > 12) {
                         temp = temp / 12;
                         if (temp == 1) {
-                            msg = temp + " yr ago";
+                            msg = temp + " year ago";
                         } else {
-                            msg = temp + " yrs ago";
+                            msg = temp + " years ago";
                         }
                     } else {
                         if (temp == 1) {
-                            msg = temp + " mnth ago";
+                            msg = temp + " month ago";
                         } else {
-                            msg = temp + " mnths ago";
+                            msg = temp + " months ago";
                         }
                     }
                 } else {

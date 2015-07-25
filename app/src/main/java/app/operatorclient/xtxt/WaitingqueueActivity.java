@@ -110,6 +110,8 @@ public class WaitingqueueActivity extends Activity {
             if (adapter == null) {
                 progressDialog = new ProgressDialog(WaitingqueueActivity.this);
                 progressDialog.setMessage("Please wait...");
+                progressDialog.setCancelable(false);
+                progressDialog.setCanceledOnTouchOutside(false);
                 progressDialog.show();
             }
         }
@@ -293,6 +295,8 @@ public class WaitingqueueActivity extends Activity {
             super.onPreExecute();
             progressDialog = new ProgressDialog(WaitingqueueActivity.this);
             progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
         }
 

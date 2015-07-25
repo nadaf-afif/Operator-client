@@ -305,6 +305,8 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             super.onPreExecute();
             progressDialog = new ProgressDialog(ChatScreenActivity.this);
             progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
             progressDialog.show();
         }
 
