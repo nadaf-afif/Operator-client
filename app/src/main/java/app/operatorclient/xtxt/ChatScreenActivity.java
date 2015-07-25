@@ -2,10 +2,13 @@ package app.operatorclient.xtxt;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -27,7 +31,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import app.operatorclient.xtxt.Requestmanager.CircularImageView;
 import app.operatorclient.xtxt.Requestmanager.LogoutAsynctask;
@@ -44,11 +50,12 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
     ListView listview;
     CustomAdapter adapter;
     CircularImageView customerPic, personaPic;
-    TextView customerName, personaName;
+    TextView customerName, personaName, loadmore;
     EditText messageEdittext;
     LinearLayout sendLinearlayout;
     SharedPreferences prefs;
     JSONObject dataJSON;
+    String customerId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +67,7 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             String data = extras.getString(DATA);
+            customerId = extras.getString(CUSTOMERID);
             try {
                 dataJSON = new JSONObject(data);
             } catch (JSONException e) {
@@ -101,9 +109,15 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             }
         });
 
+        LayoutInflater inflater = getLayoutInflater();
+        View header = inflater.inflate(R.layout.more_messages, listview, false);
+        listview.addHeaderView(header, null, false);
+        loadmore = (TextView) header.findViewById(R.id.loadMore);
+
+
         try {
             JSONObject customerJSON = dataJSON.getJSONObject(CUSTOMER);
-            JSONObject personaJSON = dataJSON.getJSONObject(PERSONA);
+            final JSONObject personaJSON = dataJSON.getJSONObject(PERSONA);
 
             customerName.setText(customerJSON.getString(NAME));
             personaName.setText(personaJSON.getString(NAME));
@@ -167,6 +181,29 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             ArrayList<Message> msgArrayList = Utils.parseMsg(messagesArray);
             adapter = new CustomAdapter(msgArrayList);
             listview.setAdapter(adapter);
+            listview.setSelection(msgArrayList.size() - 1);
+
+            boolean moreMessages = dataJSON.getBoolean(MORE_MESSAGES);
+            if (moreMessages) {
+                loadmore.setVisibility(View.VISIBLE);
+
+                loadmore.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (adapter != null) {
+                            try {
+                                String msgid = adapter.getLastMessageid();
+                                new MoreChatAsynctask().execute(customerId, msgid, personaJSON.getString(ID));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+
+            } else {
+                loadmore.setVisibility(View.GONE);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -186,6 +223,15 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             currenttime = prefs.getString(CURRENTTIME, "");
             inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        }
+
+        public List<Message> getdataArray() {
+            return data;
+        }
+
+        public String getLastMessageid() {
+            Message temp = data.get(0);
+            return temp.getMessage_id();
         }
 
         public int getCount() {
@@ -250,4 +296,94 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
         public TextView recMsg, recTime, sentMsg, sentTime;
 
     }
+
+    class MoreChatAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(ChatScreenActivity.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String response = "";
+
+            try {
+
+                Map<String, String> map = new HashMap<String, String>();
+                String authkey = prefs.getString(AUTHKEY, "");
+                map.put(RequestManger.APIKEY, authkey);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTEROPERATOR);
+
+                String url = "message_history?customer_id=" + params[0] + "&message_id=" + params[1] + "&persona_id=" + params[2];
+
+                response = RequestManger.getHttpRequestWithHeader(map, RequestManger.HOST + url);
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+
+            try {
+                JSONObject responseJSON = new JSONObject(result);
+                boolean error = responseJSON.getBoolean(ERROR);
+
+                if (!error) {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+
+                    JSONArray messageArray = dataJSON.getJSONArray(MESSAGES);
+                    ArrayList<Message> msgArrayList = Utils.parseMsg(messageArray);
+                    int position = msgArrayList.size();
+                    msgArrayList.addAll(adapter.getdataArray());
+
+                    adapter = new CustomAdapter(msgArrayList);
+                    listview.setAdapter(adapter);
+                    listview.setSelection(position);
+
+                    boolean moreMessages = dataJSON.getBoolean(MORE_MESSAGES);
+                    if (moreMessages) {
+                        loadmore.setVisibility(View.VISIBLE);
+                    } else {
+                        loadmore.setVisibility(View.GONE);
+                    }
+
+                } else {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    String message = dataJSON.getString(MESSAGE);
+                    Toast.makeText(ChatScreenActivity.this, message, Toast.LENGTH_LONG).show();
+
+
+                    Utils.clearPreferences(ChatScreenActivity.this);
+                    setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(ChatScreenActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Toast.makeText(ChatScreenActivity.this, "Unable to get data.", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+    }
+
 }

@@ -38,6 +38,7 @@ public class RequestManger {
     public interface Constantas {
         public static final String ERROR = "error";
         public static final String DATA = "data";
+        public static final String ID = "id";
         public static final String USERID = "user_id";
         public static final String SESSIONID = "session_id";
         public static final String NAME = "name";
@@ -57,6 +58,7 @@ public class RequestManger {
         public static final String AUTHKEY = "auth_key";
 
         public static final String CUSTOMER = "customer";
+        public static final String CUSTOMERID = "customer_id";
         public static final String PERSONA = "persona";
         public static final String PROFILEPIC = "profile_pic_100x100";
         public static final String SENDSMS = "send_sms";
@@ -64,6 +66,7 @@ public class RequestManger {
         public static final String DOB = "date_of_birth";
         public static final String COLOR = "colour";
         public static final String MESSAGES = "messages";
+        public static final String MORE_MESSAGES = "more_messages";
 
     }
 

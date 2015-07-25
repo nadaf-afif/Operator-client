@@ -270,10 +270,10 @@ public class WaitingqueueActivity extends Activity {
 
     private void setColor(int diff, View view, View bg) {
 
-        if (diff >= 5) {
+        if (diff >= 5 * 60) {
             view.setBackgroundColor(Color.parseColor("#e91e63"));
             bg.setBackgroundColor(Color.parseColor("#f6e2e9"));
-        } else if (diff >= 3) {
+        } else if (diff >= 3 * 60) {
             view.setBackgroundColor(Color.parseColor("#ffA500"));
             bg.setBackgroundColor(Color.parseColor("#f9f2df"));
         } else {
@@ -286,6 +286,7 @@ public class WaitingqueueActivity extends Activity {
 
     class ChatAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
         ProgressDialog progressDialog;
+        String customerId;
 
         @Override
         protected void onPreExecute() {
@@ -308,6 +309,7 @@ public class WaitingqueueActivity extends Activity {
                 map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTEROPERATOR);
 
                 response = RequestManger.getHttpRequestWithHeader(map, RequestManger.HOST + "chat/" + params[0]);
+                customerId = params[0];
 
 
             } catch (Exception ex) {
@@ -334,6 +336,7 @@ public class WaitingqueueActivity extends Activity {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     Intent intent = new Intent(WaitingqueueActivity.this, ChatScreenActivity.class);
                     intent.putExtra(DATA, dataJSON.toString());
+                    intent.putExtra(CUSTOMERID, customerId);
                     startActivityForResult(intent, 1);
                 } else {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
