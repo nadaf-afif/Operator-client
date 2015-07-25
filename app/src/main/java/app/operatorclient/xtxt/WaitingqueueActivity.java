@@ -80,6 +80,12 @@ public class WaitingqueueActivity extends Activity {
             }
         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isOpen = true;
 
         if (RequestManger.isConnectedToInternet(WaitingqueueActivity.this)) {
             new GetWaitingQueueAsynctask().execute();
@@ -87,12 +93,6 @@ public class WaitingqueueActivity extends Activity {
             Toast.makeText(WaitingqueueActivity.this, "Please check Internet Connection.", Toast.LENGTH_LONG).show();
         }
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        isOpen = true;
     }
 
     @Override
