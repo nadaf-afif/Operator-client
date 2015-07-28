@@ -119,8 +119,8 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             JSONObject customerJSON = dataJSON.getJSONObject(CUSTOMER);
             final JSONObject personaJSON = dataJSON.getJSONObject(PERSONA);
 
-            customerName.setText(customerJSON.getString(NAME));
-            personaName.setText(personaJSON.getString(NAME));
+            customerName.setText(titleLetter(customerJSON.getString(NAME)));
+            personaName.setText(titleLetter(personaJSON.getString(NAME)));
 
             Picasso.with(ChatScreenActivity.this)
                     .load(customerJSON.getString(PROFILEPIC))
@@ -209,6 +209,23 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             e.printStackTrace();
         }
 
+    }
+
+    private String titleLetter(String source) {
+
+        try {
+            String[] arr = source.split(" ");
+            StringBuffer sb = new StringBuffer();
+
+            for (int i = 0; i < arr.length; i++) {
+                sb.append(Character.toUpperCase(arr[i].charAt(0)))
+                        .append(arr[i].substring(1)).append(" ");
+            }
+            return sb.toString().trim();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return source;
     }
 
     public class CustomAdapter extends BaseAdapter {
