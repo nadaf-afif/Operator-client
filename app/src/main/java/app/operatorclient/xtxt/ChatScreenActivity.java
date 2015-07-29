@@ -109,6 +109,15 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             }
         });
 
+        changePersona.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ChatScreenActivity.this, PersonaListActivity.class);
+                intent.putExtra(CUSTOMERID, customerId);
+                startActivity(intent);
+            }
+        });
+
         LayoutInflater inflater = getLayoutInflater();
         View header = inflater.inflate(R.layout.more_messages, listview, false);
         listview.addHeaderView(header, null, false);

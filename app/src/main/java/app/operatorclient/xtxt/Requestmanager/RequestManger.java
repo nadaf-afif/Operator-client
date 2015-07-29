@@ -128,6 +128,7 @@ public class RequestManger {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Log.d("URL GET", url + " ");
         Log.d("RESPONSE GET", responseString + " ");
         return responseString;
 
