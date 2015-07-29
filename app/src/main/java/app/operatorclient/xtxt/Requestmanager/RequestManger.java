@@ -68,6 +68,9 @@ public class RequestManger {
         public static final String MESSAGES = "messages";
         public static final String MORE_MESSAGES = "more_messages";
 
+        public static final String LATITUDE = "latitude";
+        public static final String LONGITUDE = "longitude";
+
     }
 
     public static String postHttpRequestWithHeader(JSONObject object, Map<String, String> map, String url) {

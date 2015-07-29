@@ -5,15 +5,17 @@ package app.operatorclient.xtxt.Requestmanager;
  */
 public class Persona {
 
-    String distance, id, longitude, profile_pic_100, latitude, name;
+   public String distance, id, longitude, profile_pic_100, latitude, name;
+   public double dist;
 
-    public Persona(String distance, String id, String longitude, String profile_pic_100, String latitude, String name) {
+    public Persona(String distance, String id, String longitude, String profile_pic_100, String latitude, String name, double dist) {
         this.distance = distance;
         this.id = id;
         this.longitude = longitude;
         this.profile_pic_100 = profile_pic_100;
         this.latitude = latitude;
         this.name = name;
+        this.dist = dist;
     }
 
     public String getDistance() {
@@ -62,5 +64,13 @@ public class Persona {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getDist() {
+        return dist;
+    }
+
+    public void setDist(double dist) {
+        this.dist = dist;
     }
 }

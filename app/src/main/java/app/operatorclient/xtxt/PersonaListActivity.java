@@ -5,8 +5,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,10 +28,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import app.operatorclient.xtxt.Requestmanager.GPSTracker;
 import app.operatorclient.xtxt.Requestmanager.Persona;
 import app.operatorclient.xtxt.Requestmanager.RequestManger;
 import app.operatorclient.xtxt.Requestmanager.Utils;
@@ -43,6 +50,7 @@ public class PersonaListActivity extends Activity implements RequestManger.Const
     ImageAdapter adapter;
     SharedPreferences prefs;
     String customerId;
+    GPSTracker gps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +80,8 @@ public class PersonaListActivity extends Activity implements RequestManger.Const
         } else {
             Toast.makeText(PersonaListActivity.this, "Please check Internet Connection.", Toast.LENGTH_LONG).show();
         }
+
+        getGPSLocation();
 
     }
 
@@ -133,6 +143,8 @@ public class PersonaListActivity extends Activity implements RequestManger.Const
                     }.getType();
 
                     List<Persona> personas = gson.fromJson(personaArray.toString(), listType);
+
+                    personas = sortData(personas);
 
                     adapter = new ImageAdapter(personas);
                     gridview.setAdapter(adapter);
@@ -246,4 +258,89 @@ public class PersonaListActivity extends Activity implements RequestManger.Const
         return source;
     }
 
+    public void getGPSLocation() {
+        gps = new GPSTracker(PersonaListActivity.this);
+
+        // check if GPS enabled
+        if (gps.canGetLocation()) {
+
+            double latitude = gps.getLatitude();
+            double longitude = gps.getLongitude();
+
+            Log.d("LAT-LONG", latitude + "  " + longitude);
+
+            if (latitude != 0 & longitude != 0) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putString(LATITUDE, latitude + "");
+                editor.putString(LONGITUDE, longitude + "");
+                editor.apply();
+            }
+
+        } else {
+            gps.showSettingsAlert();
+        }
+    }
+
+    private List<Persona> sortData(List<Persona> personas) {
+
+        List<Persona> retPersonas = new ArrayList<>();
+
+        String lngt = prefs.getString(LONGITUDE, "");
+        String lat = prefs.getString(LATITUDE, "");
+
+        if (!TextUtils.isEmpty(lngt) && !TextUtils.isEmpty(lat)) {
+
+            Location selfLocation, location;
+
+            selfLocation = new Location("");
+            selfLocation.setLatitude(Double.parseDouble(lat));
+            selfLocation.setLongitude(Double.parseDouble(lngt));
+
+            for (Persona prsn : personas) {
+                location = new Location("");
+
+                String perlat = prsn.getLatitude();
+                String perlong = prsn.getLongitude();
+
+                if (!TextUtils.isEmpty(perlat) && !TextUtils.isEmpty(perlong)) {
+                    location.setLatitude(Double.parseDouble(perlat));
+                    location.setLongitude(Double.parseDouble(perlong));
+
+                    double distanceInMeters = selfLocation.distanceTo(location);
+                    prsn.setDist(distanceInMeters);
+                }
+
+                retPersonas.add(prsn);
+
+            }
+
+            Collections.sort(retPersonas, new MyDistComp());
+
+            return retPersonas;
+
+        }
+        Collections.sort(personas, new MyAlphaComp());
+
+        return personas;
+    }
+
+    class MyDistComp implements Comparator<Persona> {
+
+        @Override
+        public int compare(Persona e1, Persona e2) {
+            if (e1.getDist() < e2.getDist()) {
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    class MyAlphaComp implements Comparator<Persona> {
+
+        @Override
+        public int compare(Persona e1, Persona e2) {
+            return e1.name.compareToIgnoreCase(e2.name);
+        }
+    }
 }
