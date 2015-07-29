@@ -222,14 +222,12 @@ public class PersonaListActivity extends Activity implements RequestManger.Const
 
     }
 
-
     static class ViewHolder {
 
         public TextView nameTextView;
         public ImageView pic;
 
     }
-
 
     private String titleLetter(String source) {
 
