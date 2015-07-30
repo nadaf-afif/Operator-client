@@ -55,6 +55,7 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
     LinearLayout sendLinearlayout;
     SharedPreferences prefs;
     JSONObject dataJSON;
+    JSONObject personaJSON;
     String customerId;
 
     @Override
@@ -126,20 +127,24 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
 
         try {
             JSONObject customerJSON = dataJSON.getJSONObject(CUSTOMER);
-            final JSONObject personaJSON = dataJSON.getJSONObject(PERSONA);
-
             customerName.setText(titleLetter(customerJSON.getString(NAME)));
-            personaName.setText(titleLetter(personaJSON.getString(NAME)));
 
             Picasso.with(ChatScreenActivity.this)
                     .load(customerJSON.getString(PROFILEPIC))
                     .placeholder(R.drawable.profilepic)
                     .into(customerPic);
 
-            Picasso.with(ChatScreenActivity.this)
-                    .load(personaJSON.getString(PROFILEPIC))
-                    .placeholder(R.drawable.profilepic)
-                    .into(personaPic);
+            if (dataJSON.get(PERSONA) instanceof JSONObject) {
+                personaJSON = dataJSON.getJSONObject(PERSONA);
+                personaName.setText(titleLetter(personaJSON.getString(NAME)));
+
+                Picasso.with(ChatScreenActivity.this)
+                        .load(personaJSON.getString(PROFILEPIC))
+                        .placeholder(R.drawable.profilepic)
+                        .into(personaPic);
+            } else if (dataJSON.get(PERSONA) instanceof JSONArray) {
+                sendLinearlayout.setVisibility(View.GONE);
+            }
 
             boolean isSendSMS = dataJSON.getBoolean(SENDSMS);
             if (!isSendSMS) {
@@ -175,6 +180,9 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
 
                 int diff = cal.get(Calendar.YEAR) - calDOB.get(Calendar.YEAR);
                 if (diff < 18) {
+                    media.setVisibility(View.GONE);
+                }
+                if (customerDOB.contains("0000")) {
                     media.setVisibility(View.GONE);
                 }
             } catch (Exception e) {
@@ -213,6 +221,24 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
             } else {
                 loadmore.setVisibility(View.GONE);
             }
+
+            customerPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    new CustomerDataAsynctask().execute(customerId);
+                }
+            });
+
+            personaPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    try {
+                        new PersonaDataAsynctask().execute(personaJSON.getString(ID));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -413,5 +439,153 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
         }
 
     }
+
+    class CustomerDataAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(ChatScreenActivity.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String response = "";
+
+            try {
+
+                Map<String, String> map = new HashMap<String, String>();
+                String authkey = prefs.getString(AUTHKEY, "");
+                map.put(RequestManger.APIKEY, authkey);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTEROPERATOR);
+
+                response = RequestManger.getHttpRequestWithHeader(map, RequestManger.HOST + "customer_details/" + params[0]);
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+            try {
+                JSONObject responseJSON = new JSONObject(result);
+                boolean error = responseJSON.getBoolean(ERROR);
+
+                if (!error) {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    Intent intent = new Intent(ChatScreenActivity.this, CustomerDetailsActivity.class);
+                    intent.putExtra(DATA, dataJSON.toString());
+                    intent.putExtra(CUSTOMERID, customerId);
+                    startActivity(intent);
+                } else {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    String message = dataJSON.getString(MESSAGE);
+                    Toast.makeText(ChatScreenActivity.this, message, Toast.LENGTH_LONG).show();
+
+
+                    Utils.clearPreferences(ChatScreenActivity.this);
+                    setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(ChatScreenActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Toast.makeText(ChatScreenActivity.this, "Unable to get data.", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+    }
+
+    class PersonaDataAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
+        ProgressDialog progressDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(ChatScreenActivity.this);
+            progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String response = "";
+
+            try {
+
+                Map<String, String> map = new HashMap<String, String>();
+                String authkey = prefs.getString(AUTHKEY, "");
+                map.put(RequestManger.APIKEY, authkey);
+                map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTEROPERATOR);
+
+                response = RequestManger.getHttpRequestWithHeader(map, RequestManger.HOST + "persona_details/" + params[0]);
+
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (progressDialog != null) {
+                if (progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
+            }
+
+            try {
+                JSONObject responseJSON = new JSONObject(result);
+                boolean error = responseJSON.getBoolean(ERROR);
+
+                if (!error) {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+
+                } else {
+                    JSONObject dataJSON = responseJSON.getJSONObject(DATA);
+                    String message = dataJSON.getString(MESSAGE);
+                    Toast.makeText(ChatScreenActivity.this, message, Toast.LENGTH_LONG).show();
+
+
+                    Utils.clearPreferences(ChatScreenActivity.this);
+                    setResult(Activity.RESULT_OK);
+                    Intent intent = new Intent(ChatScreenActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                Toast.makeText(ChatScreenActivity.this, "Unable to get data.", Toast.LENGTH_LONG).show();
+            }
+
+        }
+
+    }
+
 
 }

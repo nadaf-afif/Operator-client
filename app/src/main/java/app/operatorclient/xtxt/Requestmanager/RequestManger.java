@@ -71,6 +71,9 @@ public class RequestManger {
         public static final String LATITUDE = "latitude";
         public static final String LONGITUDE = "longitude";
 
+        public static final String TOWN = "town";
+        public static final String AGE = "age";
+
     }
 
     public static String postHttpRequestWithHeader(JSONObject object, Map<String, String> map, String url) {
