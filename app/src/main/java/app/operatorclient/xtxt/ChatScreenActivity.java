@@ -517,6 +517,7 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
 
     class PersonaDataAsynctask extends AsyncTask<String, Void, String> implements RequestManger.Constantas {
         ProgressDialog progressDialog;
+        String personaid;
 
         @Override
         protected void onPreExecute() {
@@ -539,6 +540,8 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
                 String authkey = prefs.getString(AUTHKEY, "");
                 map.put(RequestManger.APIKEY, authkey);
                 map.put(RequestManger.REQUESTERKEY, RequestManger.REQUESTEROPERATOR);
+
+                personaid = params[0];
 
                 response = RequestManger.getHttpRequestWithHeader(map, RequestManger.HOST + "persona_details/" + params[0]);
 
@@ -564,7 +567,10 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
 
                 if (!error) {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
-
+                    Intent intent = new Intent(ChatScreenActivity.this, PersonaDetailsActivity.class);
+                    intent.putExtra(DATA, dataJSON.toString());
+                    intent.putExtra(PERSONAID, personaid);
+                    startActivity(intent);
                 } else {
                     JSONObject dataJSON = responseJSON.getJSONObject(DATA);
                     String message = dataJSON.getString(MESSAGE);
