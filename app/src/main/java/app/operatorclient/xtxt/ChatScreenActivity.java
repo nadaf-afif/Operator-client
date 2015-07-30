@@ -56,7 +56,7 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
     SharedPreferences prefs;
     JSONObject dataJSON;
     JSONObject personaJSON;
-    String customerId;
+    String customerId, timezone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +133,7 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
                     .load(customerJSON.getString(PROFILEPIC))
                     .placeholder(R.drawable.profilepic)
                     .into(customerPic);
+            timezone = customerJSON.getString(TIMEZONE);
 
             if (dataJSON.get(PERSONA) instanceof JSONObject) {
                 personaJSON = dataJSON.getJSONObject(PERSONA);
@@ -328,12 +329,12 @@ public class ChatScreenActivity extends Activity implements RequestManger.Consta
                 holder.received.setVisibility(View.VISIBLE);
                 holder.sent.setVisibility(View.GONE);
                 holder.recMsg.setText(message.getMessage());
-                holder.recTime.setText(Utils.dateDiff(currenttime, message.getCreated()));
+                holder.recTime.setText(Utils.getLocalTime(message.getCreated(), timezone));
             } else {
                 holder.received.setVisibility(View.GONE);
                 holder.sent.setVisibility(View.VISIBLE);
                 holder.sentMsg.setText(message.getMessage());
-                holder.sentTime.setText(Utils.dateDiff(currenttime, message.getCreated()));
+                holder.sentTime.setText(Utils.getLocalTime(message.getCreated(), timezone));
             }
 
 

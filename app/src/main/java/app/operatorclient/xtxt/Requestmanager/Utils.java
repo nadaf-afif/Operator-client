@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,6 +13,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * Created by mac on 04/07/15.
@@ -59,6 +61,26 @@ public class Utils {
         int ret = (int) (diff / 1000);
 
         return ret;
+    }
+
+    public static String getLocalTime(String timeString, String timezone) {
+        String parsedate = "";
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat(
+                    "yyyy-MM-dd HH:mm:ss");
+            Date date = formatter.parse(timeString);
+            TimeZone tz = TimeZone.getDefault();
+
+            SimpleDateFormat sdfAmerica = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+            TimeZone tzInAmerica = TimeZone.getTimeZone(timezone);
+            sdfAmerica.setTimeZone(tzInAmerica);
+
+            parsedate = sdfAmerica.format(date);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return parsedate;
     }
 
     public static String dateDiff(String currenttime, String datestring) {

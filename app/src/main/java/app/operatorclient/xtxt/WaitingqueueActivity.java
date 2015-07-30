@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -165,9 +166,12 @@ public class WaitingqueueActivity extends Activity {
                     }.getType();
 
                     List<Customer> customers = gson.fromJson(customerArray.toString(), listType);
-
-                    adapter = new CustomAdapter(customers, currenttime);
-                    listview.setAdapter(adapter);
+                    if (adapter == null) {
+                        adapter = new CustomAdapter(customers, currenttime);
+                        listview.setAdapter(adapter);
+                    } else {
+                        adapter.refresh(customers, currenttime);
+                    }
 
                     if (RequestManger.isConnectedToInternet(WaitingqueueActivity.this) && isOpen) {
                         new GetWaitingQueueAsynctask().execute();
@@ -207,6 +211,13 @@ public class WaitingqueueActivity extends Activity {
             this.currenttime = currenttime;
             inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        }
+
+        public void refresh(List<Customer> data, String currenttime) {
+            this.currenttime = currenttime;
+            this.data.clear();
+            this.data.addAll(data);
+            notifyDataSetChanged();
         }
 
         public int getCount() {

@@ -76,6 +76,7 @@ public class RequestManger {
         public static final String AREA = "area";
         public static final String AGE = "age";
         public static final String STS = "status";
+        public static final String TIMEZONE = "timezone";
 
     }
 
